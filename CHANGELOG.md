@@ -19,7 +19,7 @@
 - Updated dependencies [[`f5b05736`](https://github.com/Shopify/hydrogen/commit/f5b05736a3774b51ff695f1dc5bd16609cc68bf2), [`e992de2c`](https://github.com/Shopify/hydrogen/commit/e992de2c73462a954620c3ef896849782d18e506), [`f6469d11`](https://github.com/Shopify/hydrogen/commit/f6469d11248543c98e5166f8d8c1a2e2d9e5764c), [`b81b452d`](https://github.com/Shopify/hydrogen/commit/b81b452d010c650b1de1678f729945d1d4394820), [`945c55ae`](https://github.com/Shopify/hydrogen/commit/945c55aeb3b80f4b6c39d3527ec09c1bc6cd8477)]:
   - @shopify/hydrogen@2023.7.12
   - @shopify/cli-hydrogen@5.5.0
-  - @shopify/remix-oxygen@1.1.8
+  - @netlify/remix-runtime@1.1.8
 
 ## 2.1.4
 
@@ -29,7 +29,7 @@
 
 - Updated dependencies [[`cf5fe844`](https://github.com/Shopify/hydrogen/commit/cf5fe844bad989ec944d03bacf3666a6ab09063c), [`4f735fd7`](https://github.com/Shopify/hydrogen/commit/4f735fd725aef26cd3bd5b50c87d2c028b93c598), [`4156d16b`](https://github.com/Shopify/hydrogen/commit/4156d16bb171a7f5dd4d5feaad7cbd03ffb4610a)]:
   - @shopify/cli-hydrogen@5.4.2
-  - @shopify/remix-oxygen@1.1.6
+  - @netlify/remix-runtime@1.1.6
   - @shopify/hydrogen@2023.7.10
 
 ## 2.1.3
@@ -165,7 +165,7 @@
 - Updated dependencies [[`b29c85d0`](https://github.com/Shopify/hydrogen/commit/b29c85d053e8beb51216fa2cce47e1d21258ad79), [`21eb9dac`](https://github.com/Shopify/hydrogen/commit/21eb9dac935722fd8d0d385b00c3bbcfb4693baa)]:
   - @shopify/hydrogen@2023.7.2
   - @shopify/cli-hydrogen@5.1.2
-  - @shopify/remix-oxygen@1.1.3
+  - @netlify/remix-runtime@1.1.3
 
 ## 2.0.1
 
@@ -190,7 +190,7 @@
   ```
 
 - Updated dependencies [[`b7a8ecf6`](https://github.com/Shopify/hydrogen/commit/b7a8ecf6a687e72de7745a78c61c1a78a9a52629), [`ef809228`](https://github.com/Shopify/hydrogen/commit/ef809228da8d6d4f1b3301221e1e03d24cac63fa), [`1015f170`](https://github.com/Shopify/hydrogen/commit/1015f17028beb2ab00e381a61e9f4132e74b17ad), [`076bab7d`](https://github.com/Shopify/hydrogen/commit/076bab7d31ffcd918c4a3b0dd7be03e00d2dd913)]:
-  - @shopify/remix-oxygen@1.1.2
+  - @netlify/remix-runtime@1.1.2
   - @shopify/hydrogen@2023.7.1
   - @shopify/cli-hydrogen@5.1.1
 
@@ -249,7 +249,7 @@
   ```
 
 - Updated dependencies [[`f29e178a`](https://github.com/Shopify/hydrogen/commit/f29e178ada608ef3797c5049fd498afeed272152)]:
-  - @shopify/remix-oxygen@1.1.1
+  - @netlify/remix-runtime@1.1.1
   - @shopify/hydrogen@2023.4.5
   - @shopify/cli-hydrogen@5.0.1
 
@@ -276,7 +276,7 @@
 - Updated dependencies [[`b2195520`](https://github.com/Shopify/hydrogen/commit/b219552030ed9cdb3fcd3343deaf5c502d12411b), [`4c5cdfd6`](https://github.com/Shopify/hydrogen/commit/4c5cdfd61b4634c76db7ecca05972102071109f9), [`7b4afea2`](https://github.com/Shopify/hydrogen/commit/7b4afea29a050f9c77482540e321d9bc60351b2e), [`42683d0a`](https://github.com/Shopify/hydrogen/commit/42683d0a1b6288d8f6a6e58bfbf2e2650f0d82d2), [`7d6a1a7c`](https://github.com/Shopify/hydrogen/commit/7d6a1a7cd3adb6ee0cf4cf242b72d5650509639b), [`808ceb51`](https://github.com/Shopify/hydrogen/commit/808ceb518a30389d0df4226bed23aead65ccd11f), [`442f602a`](https://github.com/Shopify/hydrogen/commit/442f602a45902beeb188575a85151f45b8be23ca), [`be912b2f`](https://github.com/Shopify/hydrogen/commit/be912b2ff7f4bc7a45688ff96d76f482b164efe5), [`8ccf6dbe`](https://github.com/Shopify/hydrogen/commit/8ccf6dbe7fb9cb2dec161dea2653c4ef6ba212c4), [`428c78dc`](https://github.com/Shopify/hydrogen/commit/428c78dcb6005c369c0c60e4c4cffb869afa7eb1), [`93a7c3c6`](https://github.com/Shopify/hydrogen/commit/93a7c3c65fc10c8b1a16cee5fa57ad932d278dc8), [`5124d618`](https://github.com/Shopify/hydrogen/commit/5124d6189ccfc208b65d4e8894be1a9a2bfb7db9)]:
   - @shopify/cli-hydrogen@5.0.0
   - @shopify/hydrogen@2023.4.4
-  - @shopify/remix-oxygen@1.1.0
+  - @netlify/remix-runtime@1.1.0
 
 ## 1.0.2
 
@@ -287,7 +287,7 @@
 - Updated dependencies [[`7aaa4e86`](https://github.com/Shopify/hydrogen/commit/7aaa4e86739e22b2d9a517e2b2cfc20110c87acd)]:
   - @shopify/cli-hydrogen@4.2.1
   - @shopify/hydrogen@2023.4.3
-  - @shopify/remix-oxygen@1.0.7
+  - @netlify/remix-runtime@1.0.7
 
 ## 1.0.1
 
@@ -319,7 +319,7 @@
 
 - Updated dependencies [[`685bb696`](https://github.com/Shopify/hydrogen/commit/685bb696a9bd03b8a7fe8bcefa3630d6ba0c99c8), [`025385b6`](https://github.com/Shopify/hydrogen/commit/025385b6f9f58a76ffb15d9f505dfbf2b5e21427), [`35a87107`](https://github.com/Shopify/hydrogen/commit/35a871073941e008e104e9c491719d4cade8b49a), [`33f33edd`](https://github.com/Shopify/hydrogen/commit/33f33edd205bbc113047533c71c71ad53bc91b3e), [`0a009a3b`](https://github.com/Shopify/hydrogen/commit/0a009a3ba06dadd8f9d799575d7f88590f82a966), [`9c2e67c5`](https://github.com/Shopify/hydrogen/commit/9c2e67c52ec1c77062cb667505560afb757372a9), [`9c2e67c5`](https://github.com/Shopify/hydrogen/commit/9c2e67c52ec1c77062cb667505560afb757372a9), [`3d458e2b`](https://github.com/Shopify/hydrogen/commit/3d458e2b3c66a4daac798598cadba38b9ecd8a1e)]:
   - @shopify/cli-hydrogen@4.1.2
-  - @shopify/remix-oxygen@1.0.6
+  - @netlify/remix-runtime@1.0.6
   - @shopify/hydrogen@2023.4.1
 
 ## 0.2.1
@@ -347,7 +347,7 @@
   1. For any routes that you used `meta` route export, convert it to the `V2_MetaFunction` equivalent. Notice that the package name in the import statement has also changed to `'@remix-run/react'`:
 
      ```diff
-     - import {type MetaFunction} from '@shopify/remix-oxygen';
+     - import {type MetaFunction} from '@netlify/remix-runtime';
      + import {type V2_MetaFunction} from '@remix-run/react';
 
      - export const meta: MetaFunction = () => {
@@ -658,4 +658,4 @@
 - Updated dependencies [[`e6e6c2d`](https://github.com/Shopify/hydrogen/commit/e6e6c2da274d0582c6b3b9f298dfd2e86dd4bfbe), [`475a39c`](https://github.com/Shopify/hydrogen/commit/475a39c867b0851bba0358b6db9208b664aec68c), [`1f8526c`](https://github.com/Shopify/hydrogen/commit/1f8526c750dc1d5aa7ea02e196fffdd14d17a536), [`0f4d562`](https://github.com/Shopify/hydrogen/commit/0f4d562a2129e8e03ed123dc572a14a72e487a1b), [`737f83e`](https://github.com/Shopify/hydrogen/commit/737f83ebb72fccc2f367532ebaa19ea00b1b3436), [`2d4c5d9`](https://github.com/Shopify/hydrogen/commit/2d4c5d9340c5a2458c682aa3f9b12352dacdd759), [`68a6028`](https://github.com/Shopify/hydrogen/commit/68a60285a3d563d6e98fb79c3ba6d98eb4ee6be0)]:
   - @shopify/cli-hydrogen@4.1.0
   - @shopify/hydrogen@2023.1.7
-  - @shopify/remix-oxygen@1.0.5
+  - @netlify/remix-runtime@1.0.5

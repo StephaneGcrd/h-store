@@ -1,6 +1,5 @@
 /// <reference types="vite/client" />
-/// <reference types="@shopify/remix-oxygen" />
-/// <reference types="@shopify/oxygen-workers-types" />
+/// <reference types="@netlify/remix-runtime" />
 
 import type {
   WithCache,
@@ -32,7 +31,7 @@ declare global {
   }
 }
 
-declare module '@shopify/remix-oxygen' {
+declare module '@netlify/remix-runtime' {
   /**
    * Declare local additions to the Remix loader context.
    */

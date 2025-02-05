@@ -3,7 +3,7 @@ import {
   type MetaArgs,
   type LinksFunction,
   type LoaderFunctionArgs,
-} from '@shopify/remix-oxygen';
+} from '@netlify/remix-runtime';
 import {useLoaderData} from '@remix-run/react';
 import {getSeoMeta, Image} from '@shopify/hydrogen';
 import invariant from 'tiny-invariant';
