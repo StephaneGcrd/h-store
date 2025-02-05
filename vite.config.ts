@@ -7,15 +7,23 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 import {netlifyPlugin} from '@netlify/remix-edge-adapter/plugin';
 
 export default defineConfig({
+  server: {
+    allowedHosts: [
+      'cspsandbox.work',
+      'localhost',
+      'csp.ngrok.app',
+      'comptoir-sud-pacifique.com',
+    ],
+  },
   plugins: [
     hydrogen(),
+
     remix({
       presets: [hydrogen.preset()],
       future: {
         v3_fetcherPersist: true,
         v3_relativeSplatPath: true,
         v3_throwAbortReason: true,
-        v3_lazyRouteDiscovery: true,
       },
     }),
     tsconfigPaths(),
@@ -23,7 +31,7 @@ export default defineConfig({
   ],
   ssr: {
     optimizeDeps: {
-      include: ['typographic-base'],
+      include: ['prop-types', 'typographic-base'],
     },
   },
   optimizeDeps: {

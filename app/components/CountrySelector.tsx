@@ -11,10 +11,11 @@ import {IconCheck} from '~/components/Icon';
 import type {Localizations, Locale} from '~/lib/type';
 import {DEFAULT_LOCALE} from '~/lib/utils';
 import type {RootLoader} from '~/root';
+import {GlobeIcon} from './icons';
+import {countries} from '~/data/countries';
 
 export function CountrySelector() {
   const fetcher = useFetcher();
-  const closeRef = useRef<HTMLDetailsElement>(null);
   const rootData = useRouteLoaderData<RootLoader>('root');
   const selectedLocale = rootData?.selectedLocale ?? DEFAULT_LOCALE;
   const {pathname, search} = useLocation();
@@ -23,7 +24,6 @@ export function CountrySelector() {
     '',
   )}${search}`;
 
-  const countries = (fetcher.data ?? {}) as Localizations;
   const defaultLocale = countries?.['default'];
   const defaultLocalePrefix = defaultLocale
     ? `${defaultLocale?.language}-${defaultLocale?.country}`
@@ -45,55 +45,44 @@ export function CountrySelector() {
     fetcher.load('/api/countries');
   }, [inView, fetcher]);
 
-  const closeDropdown = useCallback(() => {
-    closeRef.current?.removeAttribute('open');
-  }, []);
+  const handleChange = useCallback(
+    (event) => {
+      const selectedCountryPath = event.target.value;
+      const countryLocale = countries[selectedCountryPath];
+      const countryUrlPath = getCountryUrlPath({
+        countryLocale,
+        defaultLocalePrefix,
+        pathWithoutLocale,
+      }).split('?')[0]; // Trim the parameters after the ?
+
+      window.location.href = countryUrlPath;
+    },
+    [countries, defaultLocalePrefix, pathWithoutLocale],
+  );
 
   return (
-    <section
-      ref={observerRef}
-      className="grid w-full gap-4"
-      onMouseLeave={closeDropdown}
-    >
-      <Heading size="lead" className="cursor-default" as="h3">
-        Country
-      </Heading>
-      <div className="relative">
-        <details
-          className="absolute w-full border rounded border-contrast/30 dark:border-white open:round-b-none overflow-clip"
-          ref={closeRef}
-        >
-          <summary className="flex items-center justify-between w-full px-4 py-3 cursor-pointer">
-            {selectedLocale.label}
-          </summary>
-          <div className="w-full overflow-auto border-t border-contrast/30 dark:border-white bg-contrast/30 max-h-36">
-            {countries &&
-              Object.keys(countries).map((countryPath) => {
-                const countryLocale = countries[countryPath];
-                const isSelected =
-                  countryLocale.language === selectedLocale.language &&
-                  countryLocale.country === selectedLocale.country;
-
-                const countryUrlPath = getCountryUrlPath({
-                  countryLocale,
-                  defaultLocalePrefix,
-                  pathWithoutLocale,
-                });
-
-                return (
-                  <Country
-                    key={countryPath}
-                    closeDropdown={closeDropdown}
-                    countryUrlPath={countryUrlPath}
-                    isSelected={isSelected}
-                    countryLocale={countryLocale}
-                  />
-                );
-              })}
-          </div>
-        </details>
-      </div>
-    </section>
+    <div className="flex  w-full items-center">
+      <GlobeIcon />
+      <select
+        className="w-full px-4 py-2 border rounded border-contrast/30 dark:border-white bg-contrast/30 text-[14px]"
+        onChange={handleChange}
+        value={Object.keys(countries).find(
+          (countryPath) =>
+            countries[countryPath].language === selectedLocale.language &&
+            countries[countryPath].country === selectedLocale.country,
+        )}
+      >
+        {countries &&
+          Object.keys(countries).map((countryPath) => {
+            const countryLocale = countries[countryPath];
+            return (
+              <option key={countryPath} value={countryPath}>
+                {countryLocale.label}
+              </option>
+            );
+          })}
+      </select>
+    </div>
   );
 }
 

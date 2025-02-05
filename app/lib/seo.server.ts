@@ -21,7 +21,7 @@ import type {
 } from 'schema-dts';
 
 import type {ShopFragment} from 'storefrontapi.generated';
-
+//
 function root({
   shop,
   url,
@@ -87,12 +87,14 @@ type ProductRequiredFields = Pick<
   Product,
   'title' | 'description' | 'vendor' | 'seo'
 > & {
-  variants: Array<
-    Pick<
-      ProductVariant,
-      'sku' | 'price' | 'selectedOptions' | 'availableForSale'
-    >
-  >;
+  variants: {
+    nodes: Array<
+      Pick<
+        ProductVariant,
+        'sku' | 'price' | 'selectedOptions' | 'availableForSale'
+      >
+    >;
+  };
 };
 
 function productJsonLd({
@@ -105,7 +107,7 @@ function productJsonLd({
   url: Request['url'];
 }): SeoConfig['jsonLd'] {
   const origin = new URL(url).origin;
-  const variants = product.variants;
+  const variants = product.variants.nodes;
   const description = truncate(
     product?.seo?.description ?? product?.description,
   );

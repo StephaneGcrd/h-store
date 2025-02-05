@@ -1,0 +1,162 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* @font-face {
+  font-family: 'Albert Sans';
+  font-display: swap;
+  src: url('fonts/Albert-Sans/AlbertSans-VariableFont_wght.ttf')
+    format('truetype');
+} */
+
+@layer utilities {
+  .font-thin {
+    font-variation-settings: 'wght' 100;
+  }
+  .font-extralight {
+    font-variation-settings: 'wght' 200;
+  }
+  .font-light {
+    font-variation-settings: 'wght' 300;
+  }
+  .font-normal {
+    font-variation-settings: 'wght' 400;
+  }
+  .font-medium {
+    font-variation-settings: 'wght' 500;
+  }
+  .font-semibold {
+    font-variation-settings: 'wght' 600;
+  }
+  .font-bold {
+    font-variation-settings: 'wght' 700;
+  }
+  .font-extrabold {
+    font-variation-settings: 'wght' 800;
+  }
+  .font-black {
+    font-variation-settings: 'wght' 900;
+  }
+}
+
+@layer components {
+  .btn-account-menu {
+    @apply border-slate-200 border rounded-md px-4 py-2 w-full my-2 text-center block;
+  }
+
+  .btn-account-menu-no-border {
+    @apply px-4 py-2 w-full my-2 text-center block;
+  }
+
+  .input-account {
+    @apply w-full;
+  }
+
+  .label-input-account {
+    @apply font-bold;
+  }
+
+  .spacing-header-banner {
+    @apply h-8;
+  }
+
+  .spacing-header {
+    @apply h-16;
+  }
+
+  .spacing-header-total {
+    @apply h-0;
+  }
+
+  .btn-primary {
+    @apply bg-comptoir-bluedarker w-full py-2 text-white border border-comptoir-bluedarker text-center block;
+  }
+
+  .btn-secondary {
+    @apply w-full py-2 text-comptoir-bluedarker border border-comptoir-bluedarker text-center block;
+  }
+
+  .btn-secondary-white {
+    @apply w-full py-2 text-white border border-white text-center block;
+  }
+
+  .btn-secondary-disabled {
+    @apply w-full py-2 text-comptoir-disabled border border-comptoir-disabled text-center block cursor-default;
+  }
+
+  .btn-primary-disabled {
+    @apply bg-comptoir-lightblue w-full py-2 text-comptoir-disabled text-center block cursor-default;
+  }
+
+  .btn-sm {
+    @apply w-full py-2 text-comptoir-bluedarker text-center block;
+  }
+
+  .btn-sm-disabled {
+    @apply w-full py-2 text-comptoir-disabled text-center block cursor-default;
+  }
+
+  .btn-image {
+    @apply py-1 text-white text-center border-white border font-medium px-2 hover:bg-slate-200 hover:text-black active:bg-slate-300 hover:cursor-pointer transition-colors;
+  }
+
+  .div-padding {
+    @apply p-4;
+  }
+
+  .my-base {
+    @apply my-2;
+  }
+
+  .font-garamond-tracked {
+    @apply tracking-tighter font-garamond;
+  }
+
+  .title-page {
+    @apply text-center text-3xl mb-2 font-normal font-garamond-tracked;
+  }
+
+  .t-banner {
+    @apply text-3xl md:text-3xl font-normal font-garamond-tracked;
+  }
+
+  .t1 {
+    @apply text-3xl md:text-3xl font-normal font-garamond-tracked;
+  }
+
+  .t2 {
+    @apply text-2xl font-garamond-tracked;
+  }
+
+  .t3 {
+    @apply text-xl font-garamond-tracked;
+  }
+
+  .tp {
+    @apply text-lg font-bold;
+  }
+
+  .btn-layout-row {
+    @apply flex flex-col gap-2;
+  }
+
+  .image-layout-row {
+    @apply flex flex-col gap-1 items-center max-w-xl;
+  }
+
+  .input-primary {
+    @apply bg-comptoir-lightblue border-none w-full;
+  }
+
+  .form-gap {
+    @apply flex flex-col gap-2;
+  }
+
+  .margin-btn-form {
+    @apply my-4;
+  }
+
+  .center-item-inside {
+    @apply flex flex-col justify-center items-center;
+  }
+}

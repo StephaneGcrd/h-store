@@ -1,19 +1,18 @@
-import {
-  defer,
-  type MetaArgs,
-  type LoaderFunctionArgs,
-} from '@netlify/remix-runtime';
-import {Suspense} from 'react';
-import {Await, useLoaderData} from '@remix-run/react';
-import {getSeoMeta} from '@shopify/hydrogen';
+import {defer, type LoaderFunctionArgs} from '@netlify/remix-runtime';
 
-import {Hero} from '~/components/Hero';
-import {FeaturedCollections} from '~/components/FeaturedCollections';
-import {ProductSwimlane} from '~/components/ProductSwimlane';
+import {Await, useLoaderData} from '@remix-run/react';
+
 import {MEDIA_FRAGMENT, PRODUCT_CARD_FRAGMENT} from '~/data/fragments';
 import {getHeroPlaceholder} from '~/lib/placeholders';
 import {seoPayload} from '~/lib/seo.server';
 import {routeHeaders} from '~/data/cache';
+
+import {Suspense} from 'react';
+
+import {HOMEPAGE_ELEMENTS_QUERY} from '~/graphql/content/ContentQueries';
+import SectionElement from '~/components/homepage/SectionElement';
+import {transformReferencesArrayToJsObjectArray} from '~/lib/clean_content_metafield';
+import {I18N_CONTENT_QUERY} from '~/graphql/layout/i18nQuery';
 
 export const headers = routeHeaders;
 
@@ -44,17 +43,27 @@ export async function loader(args: LoaderFunctionArgs) {
  * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
  */
 async function loadCriticalData({context, request}: LoaderFunctionArgs) {
-  const [{shop, hero}] = await Promise.all([
+  const [{shop, hero}, i18nQuery] = await Promise.all([
     context.storefront.query(HOMEPAGE_SEO_QUERY, {
       variables: {handle: 'freestyle'},
     }),
+    context.storefront.query(I18N_CONTENT_QUERY, {
+      variables: {
+        language: context.storefront.i18n.language,
+      },
+    }),
     // Add other queries here, so that they are loaded in parallel
   ]);
+
+  const i18nData = JSON.parse(i18nQuery?.metaobject?.content?.value);
 
   return {
     shop,
     primaryHero: hero,
     seo: seoPayload.home({url: request.url}),
+    title: i18nData.meta.home.title,
+    description: i18nData.meta.home.description,
+    href: request.url.split('?')[0],
   };
 }
 
@@ -65,6 +74,25 @@ async function loadCriticalData({context, request}: LoaderFunctionArgs) {
  */
 function loadDeferredData({context}: LoaderFunctionArgs) {
   const {language, country} = context.storefront.i18n;
+
+  const homepageElements = context.storefront
+    .query(HOMEPAGE_ELEMENTS_QUERY, {
+      variables: {
+        /**
+         * Country and language properties are automatically injected
+         * into all queries. Passing them is unnecessary unless you
+         * want to override them from the following default:
+         */
+        country,
+        language,
+      },
+    })
+    .catch((error) => {
+      // Log query errors, but don't throw them so the page can still render
+      // eslint-disable-next-line no-console
+      console.error(error);
+      return null;
+    });
 
   const featuredProducts = context.storefront
     .query(HOMEPAGE_FEATURED_PRODUCTS_QUERY, {
@@ -134,12 +162,44 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
     secondaryHero,
     featuredCollections,
     tertiaryHero,
+    homepageElements,
   };
 }
 
-export const meta = ({matches}: MetaArgs<typeof loader>) => {
-  return getSeoMeta(...matches.map((match) => (match.data as any).seo));
+export const meta = ({data}) => {
+  return [
+    {title: data.title},
+    {
+      name: 'description',
+      content: data.description,
+    },
+    {
+      tagName: 'link',
+      rel: 'canonical',
+      href: data.href,
+    },
+  ];
 };
+
+export function links() {
+  return [
+    {
+      rel: 'alternate',
+      href: 'https://www.comptoir-sud-pacifique.com/en-gb/',
+      hrefLang: 'en',
+    },
+    {
+      rel: 'alternate',
+      href: 'https://www.comptoir-sud-pacifique.com/fr-fr/',
+      hrefLang: 'fr-fr',
+    },
+    {
+      rel: 'alternate',
+      href: 'https://www.comptoir-sud-pacifique.com',
+      hrefLang: 'x-default',
+    },
+  ];
+}
 
 export default function Homepage() {
   const {
@@ -147,6 +207,7 @@ export default function Homepage() {
     secondaryHero,
     tertiaryHero,
     featuredCollections,
+    homepageElements,
     featuredProducts,
   } = useLoaderData<typeof loader>();
 
@@ -155,80 +216,23 @@ export default function Homepage() {
 
   return (
     <>
-      {primaryHero && (
-        <Hero {...primaryHero} height="full" top loading="eager" />
-      )}
+      <Suspense>
+        <Await resolve={homepageElements}>
+          {(homepageElements) => {
+            return transformReferencesArrayToJsObjectArray(
+              homepageElements.metaobject.elements.references.nodes,
+            ).map((element) => (
+              <SectionElement key={element.id} element={element} />
+            ));
+          }}
+        </Await>
+      </Suspense>
 
-      {featuredProducts && (
-        <Suspense>
-          <Await resolve={featuredProducts}>
-            {(response) => {
-              if (
-                !response ||
-                !response?.products ||
-                !response?.products?.nodes
-              ) {
-                return <></>;
-              }
-              return (
-                <ProductSwimlane
-                  products={response.products}
-                  title="Featured Products"
-                  count={4}
-                />
-              );
-            }}
-          </Await>
-        </Suspense>
-      )}
-
-      {secondaryHero && (
-        <Suspense fallback={<Hero {...skeletons[1]} />}>
-          <Await resolve={secondaryHero}>
-            {(response) => {
-              if (!response || !response?.hero) {
-                return <></>;
-              }
-              return <Hero {...response.hero} />;
-            }}
-          </Await>
-        </Suspense>
-      )}
-
-      {featuredCollections && (
-        <Suspense>
-          <Await resolve={featuredCollections}>
-            {(response) => {
-              if (
-                !response ||
-                !response?.collections ||
-                !response?.collections?.nodes
-              ) {
-                return <></>;
-              }
-              return (
-                <FeaturedCollections
-                  collections={response.collections}
-                  title="Collections"
-                />
-              );
-            }}
-          </Await>
-        </Suspense>
-      )}
-
-      {tertiaryHero && (
-        <Suspense fallback={<Hero {...skeletons[2]} />}>
-          <Await resolve={tertiaryHero}>
-            {(response) => {
-              if (!response || !response?.hero) {
-                return <></>;
-              }
-              return <Hero {...response.hero} />;
-            }}
-          </Await>
-        </Suspense>
-      )}
+      {/*       <div className="bg-slate-300 w-full h-[600px] flex justify-center align-middle">
+        <Link to="products/aqua-motu" className={'bg-red-400 h-16'}>
+          Lien vers le produit Aqua Motu
+        </Link>
+      </div> */}
     </>
   );
 }

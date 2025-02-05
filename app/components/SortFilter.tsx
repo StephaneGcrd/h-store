@@ -47,15 +47,15 @@ export function SortFilter({
   return (
     <>
       <div className="flex items-center justify-between w-full">
-        <button
+        {/*         <button
           onClick={() => setIsOpen(!isOpen)}
           className={
             'relative flex items-center justify-center w-8 h-8 focus:ring-primary/5'
           }
         >
           <IconFilters />
-        </button>
-        <SortMenu />
+        </button> */}
+        {/*         <SortMenu /> */}
       </div>
       <div className="flex flex-col flex-wrap md:flex-row">
         <div

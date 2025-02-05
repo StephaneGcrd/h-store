@@ -40,14 +40,9 @@ export default function Page() {
   const {page} = useLoaderData<typeof loader>();
 
   return (
-    <>
-      <PageHeader heading={page.title}>
-        <div
-          dangerouslySetInnerHTML={{__html: page.body}}
-          className="prose dark:prose-invert"
-        />
-      </PageHeader>
-    </>
+    <div className="min-h-[500px]">
+      <div dangerouslySetInnerHTML={{__html: page.body}} className="" />
+    </div>
   );
 }
 

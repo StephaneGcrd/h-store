@@ -31,6 +31,8 @@ import {seoPayload} from '~/lib/seo.server';
 import {FILTER_URL_PREFIX} from '~/components/SortFilter';
 import {getImageLoadingPriority} from '~/lib/const';
 import {parseAsCurrency} from '~/lib/utils';
+import {ProductItem} from '~/components/PerfumeCard/PerfumeCard';
+import {PRODUCT_ITEM_FRAGMENT} from '~/graphql/product/ProductQueries';
 
 export const headers = routeHeaders;
 
@@ -65,7 +67,7 @@ export async function loader({params, request, context}: LoaderFunctionArgs) {
     COLLECTION_QUERY,
     {
       variables: {
-        ...paginationVariables,
+        first: 100,
         handle: collectionHandle,
         filters,
         sortKey,
@@ -82,9 +84,13 @@ export async function loader({params, request, context}: LoaderFunctionArgs) {
 
   const seo = seoPayload.collection({collection, url: request.url});
 
-  const allFilterValues = collection.products.filters.flatMap(
-    (filter) => filter.values,
+  const authorizedFilters = ['filter.v.t.shopify.season'];
+
+  const filteredFilters = collection.products.filters.filter((filter) =>
+    authorizedFilters.includes(filter.id),
   );
+
+  const allFilterValues = filteredFilters.flatMap((filter) => filter.values);
 
   const appliedFilters = filters
     .map((filter) => {
@@ -132,6 +138,7 @@ export async function loader({params, request, context}: LoaderFunctionArgs) {
   return json({
     collection,
     appliedFilters,
+    filteredFilters,
     collections: flattenConnection(collections),
     seo,
   });
@@ -142,62 +149,37 @@ export const meta = ({matches}: MetaArgs<typeof loader>) => {
 };
 
 export default function Collection() {
-  const {collection, collections, appliedFilters} =
+  const {collection, collections, appliedFilters, filteredFilters} =
     useLoaderData<typeof loader>();
 
   const {ref, inView} = useInView();
 
   return (
     <>
-      <PageHeader heading={collection.title}>
-        {collection?.description && (
-          <div className="flex items-baseline justify-between w-full">
-            <div>
-              <Text format width="narrow" as="p" className="inline-block">
-                {collection.description}
-              </Text>
-            </div>
-          </div>
-        )}
-      </PageHeader>
+      <div className="center-item-inside">
+        <div className="w-full max-w-2xl md:pt-8 md:pb-0 pt-4 px-4">
+          <p className="text-center text-sm">COLLECTION</p>
+          <h1 className="title-page ">{collection.title}</h1>
+          <p className="collection-description text-start mx-2 my-8 flex justify-center">
+            {collection.description}
+          </p>
+        </div>
+      </div>
       <Section>
         <SortFilter
-          filters={collection.products.filters as Filter[]}
+          filters={filteredFilters as Filter[]}
           appliedFilters={appliedFilters}
           collections={collections}
         >
           <Pagination connection={collection.products}>
-            {({
-              nodes,
-              isLoading,
-              PreviousLink,
-              NextLink,
-              nextPageUrl,
-              hasNextPage,
-              state,
-            }) => (
+            {({nodes, isLoading, state}) => (
               <>
-                <div className="flex items-center justify-center mb-6">
-                  <Button as={PreviousLink} variant="secondary" width="full">
-                    {isLoading ? 'Loading...' : 'Load previous'}
-                  </Button>
-                </div>
-                <ProductsLoadedOnScroll
-                  nodes={nodes}
-                  inView={inView}
-                  nextPageUrl={nextPageUrl}
-                  hasNextPage={hasNextPage}
-                  state={state}
-                />
-                <div className="flex items-center justify-center mt-6">
-                  <Button
-                    ref={ref}
-                    as={NextLink}
-                    variant="secondary"
-                    width="full"
-                  >
-                    {isLoading ? 'Loading...' : 'Load more products'}
-                  </Button>
+                <div className="grid grid-cols-2 items-center min-[450px]:grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 w-full mb-4 gap-2">
+                  {nodes.map((node) => (
+                    <div className=" flex justify-center" key={node.id}>
+                      <ProductItem product={node} />
+                    </div>
+                  ))}
                 </div>
               </>
             )}
@@ -304,7 +286,7 @@ const COLLECTION_QUERY = `#graphql
           }
         }
         nodes {
-          ...ProductCard
+          ...ProductItem
         }
         pageInfo {
           hasPreviousPage
@@ -323,7 +305,7 @@ const COLLECTION_QUERY = `#graphql
       }
     }
   }
-  ${PRODUCT_CARD_FRAGMENT}
+  ${PRODUCT_ITEM_FRAGMENT}
 ` as const;
 
 function getSortValuesFromParam(sortParam: SortParam | null): {

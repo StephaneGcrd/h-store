@@ -258,15 +258,29 @@ export function getLocaleFromRequest(request: Request): I18nLocale {
   const firstPathPart =
     '/' + url.pathname.substring(1).split('/')[0].toLowerCase();
 
-  return countries[firstPathPart]
-    ? {
-        ...countries[firstPathPart],
-        pathPrefix: firstPathPart,
-      }
-    : {
-        ...countries['default'],
-        pathPrefix: '',
-      };
+  if (countries[firstPathPart]) {
+    return {
+      ...countries[firstPathPart],
+      pathPrefix: firstPathPart,
+    };
+  }
+
+  const browserLocale = request.headers
+    .get('accept-language')
+    ?.split(',')[0]
+    .toLowerCase();
+
+  if (browserLocale && countries[`/${browserLocale}`]) {
+    return {
+      ...countries[`/${browserLocale}`],
+      pathPrefix: `/${browserLocale}`,
+    };
+  }
+
+  return {
+    ...countries['default'],
+    pathPrefix: '',
+  };
 }
 
 export function usePrefixPathWithLocale(path: string) {

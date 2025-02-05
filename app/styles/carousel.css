@@ -1,0 +1,20 @@
+.product-card-carousel {
+  display: inline-flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+
+.carousel-container {
+  display: flex;
+  gap: 16px;
+}
+
+.product-card-carousel > .carousel-container > * {
+  scroll-snap-align: start;
+}
+
+.product-card {
+  width: 200px;
+  height: 300px;
+  flex: 0 0 auto;
+}

@@ -26,6 +26,7 @@ import {
   getFeaturedData,
   type FeaturedData,
 } from './($locale).featured-products';
+import {PRODUCT_ITEM_FRAGMENT} from '~/graphql/product/ProductQueries';
 
 export async function loader({
   request,
@@ -64,20 +65,20 @@ export async function loader({
     },
   });
 
-  return defer({
+  return {
     seo,
     searchTerm,
     products,
-    noResultRecommendations: shouldGetRecommendations
+    /*     noResultRecommendations: shouldGetRecommendations
       ? getNoResultRecommendations(storefront)
-      : Promise.resolve(null),
-  });
+      : Promise.resolve(null), */
+  };
 }
 
-export const meta = ({matches}: MetaArgs<typeof loader>) => {
+/* export const meta = ({matches}: MetaArgs<typeof loader>) => {
   return getSeoMeta(...matches.map((match) => (match.data as any).seo));
-};
-
+}; */
+/* 
 export default function Search() {
   const {searchTerm, products, noResultRecommendations} =
     useLoaderData<typeof loader>();
@@ -192,8 +193,9 @@ export function getNoResultRecommendations(
 ) {
   return getFeaturedData(storefront, {pageBy: PAGINATION_SIZE});
 }
-
+ */
 const SEARCH_QUERY = `#graphql
+  ${PRODUCT_ITEM_FRAGMENT}
   query PaginatedProductsSearch(
     $country: CountryCode
     $endCursor: String
@@ -208,11 +210,11 @@ const SEARCH_QUERY = `#graphql
       last: $last,
       before: $startCursor,
       after: $endCursor,
-      sortKey: RELEVANCE,
+      sortKey: TITLE,
       query: $searchTerm
     ) {
       nodes {
-        ...ProductCard
+        ...ProductItem
       }
       pageInfo {
         startCursor
@@ -223,5 +225,4 @@ const SEARCH_QUERY = `#graphql
     }
   }
 
-  ${PRODUCT_CARD_FRAGMENT}
 ` as const;

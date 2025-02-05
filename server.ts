@@ -6,7 +6,7 @@ import {
   createRequestHandler,
 } from '@netlify/remix-edge-adapter';
 import {storefrontRedirect} from '@shopify/hydrogen';
-import {createAppLoadContext} from '~/lib/context';
+import {createAppLoadContext} from './app/lib/context';
 
 export default async function (
   request: Request,

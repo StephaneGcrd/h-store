@@ -1,23 +1,28 @@
-import type {LoaderFunctionArgs} from '@netlify/remix-runtime';
+import type {LoaderArgs} from '@netlify/remix-runtime';
 
-import {getSitemapIndex} from 'app/lib/sitemap';
+export async function loader({request, context: {storefront}}: LoaderArgs) {
+  const sitemap = `
+  <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <sitemap>
+      <loc>https://www.comptoir-sud-pacifique.com/sitemap_.xml</loc>
+    </sitemap>
+    <sitemap>
+      <loc>https://www.comptoir-sud-pacifique.com/en-gb/sitemap_.xml</loc>
+    </sitemap>
+    <sitemap>
+      <loc>https://www.comptoir-sud-pacifique.com/fr-fr/sitemap_.xml</loc>
+    </sitemap>
+  </sitemapindex>
+  `;
 
-export async function loader({
-  request,
-  context: {storefront},
-}: LoaderFunctionArgs) {
-  const url = new URL(request.url);
-  const baseUrl = url.origin;
-
-  const response = await getSitemapIndex({
-    storefront,
-    request,
-    types: ['products', 'pages', 'collections', 'articles'],
-    customUrls: [`${baseUrl}/sitemap-empty.xml`],
+  return new Response(sitemap, {
+    headers: {
+      'Content-Type': 'application/xml',
+      'Cache-Control': `max-age=${60}`,
+    },
   });
+}
 
-  response.headers.set('Oxygen-Cache-Control', `max-age=${60 * 60 * 24}`);
-  response.headers.set('Vary', 'Accept-Encoding, Accept-Language');
-
-  return response;
+function xmlEncode(string: string) {
+  return string.replace(/[&<>'"]/g, (char) => `&#${char.charCodeAt(0)};`);
 }

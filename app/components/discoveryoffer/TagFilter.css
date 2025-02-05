@@ -1,0 +1,23 @@
+.tag-filter {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tag-button {
+  padding: 10px 20px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  background-color: #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.tag-button.selected {
+  background-color: #007bff;
+  color: white;
+}
+
+.tag-button:hover {
+  background-color: #e0e0e0;
+}

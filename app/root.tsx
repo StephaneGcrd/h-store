@@ -15,6 +15,7 @@ import {
   useRouteLoaderData,
   useRouteError,
   type ShouldRevalidateFunction,
+  useLoaderData,
 } from '@remix-run/react';
 import {
   useNonce,
@@ -22,17 +23,27 @@ import {
   getShopAnalytics,
   getSeoMeta,
   type SeoConfig,
+  Script,
 } from '@shopify/hydrogen';
 import invariant from 'tiny-invariant';
 
 import {PageLayout} from '~/components/PageLayout';
 import {GenericError} from '~/components/GenericError';
 import {NotFound} from '~/components/NotFound';
-import favicon from '~/assets/favicon.svg';
+import favicon from '~/assets/favicon.png';
 import {seoPayload} from '~/lib/seo.server';
-import styles from '~/styles/app.css?url';
 
 import {DEFAULT_LOCALE, parseMenu} from './lib/utils';
+import {getLayoutData} from './data/layout';
+import {I18N_CONTENT_QUERY} from './graphql/layout/i18nQuery';
+
+import tailwindCss from './styles/tailwind.css?url';
+import resetStyles from './styles/reset.css?url';
+import styles from '~/styles/app.css?url';
+import {DISCOVERY_OFFER_QUERY} from './graphql/discover-offer/DiscoveryOfferQueries';
+import {ThirdPartyAnalyticsIntegration} from './components/ThirdPartyAnalyticsIntegration';
+import {GoogleTagManager} from './components/GoogleTagManager';
+import {useEffect} from 'react';
 
 export type RootLoader = typeof loader;
 
@@ -55,17 +66,11 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
   return false;
 };
 
-/**
- * The link to the main stylesheet is purposely not in this list. Instead, it is added
- * in the Layout function.
- *
- * This is to avoid a development bug where after an edit/save, navigating to another
- * link will cause page rendering error "failed to execute 'insertBefore' on 'Node'".
- *
- * This is a workaround until this is fixed in the foundational library.
- */
 export const links: LinksFunction = () => {
   return [
+    {rel: 'stylesheet', href: tailwindCss},
+    {rel: 'stylesheet', href: resetStyles},
+    {rel: 'stylesheet', href: styles},
     {
       rel: 'preconnect',
       href: 'https://cdn.shopify.com',
@@ -96,6 +101,8 @@ export async function loader(args: LoaderFunctionArgs) {
  * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
  */
 async function loadCriticalData({request, context}: LoaderFunctionArgs) {
+  const isProduction = !request.url.includes('localhost');
+
   const [layout] = await Promise.all([
     getLayoutData(context),
     // Add other queries here, so that they are loaded in parallel
@@ -105,9 +112,15 @@ async function loadCriticalData({request, context}: LoaderFunctionArgs) {
 
   const {storefront, env} = context;
 
+  const i18nData = await storefront.query(I18N_CONTENT_QUERY, {
+    variables: {
+      language: storefront.i18n.language,
+    },
+  });
+
   return {
     layout,
-    seo,
+    //seo,
     shop: getShopAnalytics({
       storefront,
       publicStorefrontId: env.PUBLIC_STOREFRONT_ID,
@@ -115,9 +128,12 @@ async function loadCriticalData({request, context}: LoaderFunctionArgs) {
     consent: {
       checkoutDomain: env.PUBLIC_CHECKOUT_DOMAIN,
       storefrontAccessToken: env.PUBLIC_STOREFRONT_API_TOKEN,
-      withPrivacyBanner: true,
+      withPrivacyBanner: false,
     },
+    i18nData: JSON.parse(i18nData?.metaobject?.content?.value),
     selectedLocale: storefront.i18n,
+    GTM_ID: 'GTM-P6PQHT5R',
+    isProduction,
   };
 }
 
@@ -127,16 +143,28 @@ async function loadCriticalData({request, context}: LoaderFunctionArgs) {
  * Make sure to not throw any errors here, as it will cause the page to 500.
  */
 function loadDeferredData({context}: LoaderFunctionArgs) {
-  const {cart, customerAccount} = context;
+  const {cart, customerAccount, storefront} = context;
+
+  const discoveryProducts = storefront.query(DISCOVERY_OFFER_QUERY, {
+    variables: {
+      country: storefront.i18n.country,
+      language: storefront.i18n.language,
+    },
+  });
 
   return {
     isLoggedIn: customerAccount.isLoggedIn(),
     cart: cart.get(),
+    discoveryProducts,
   };
 }
 
 export const meta = ({data}: MetaArgs<typeof loader>) => {
-  return getSeoMeta(data!.seo as SeoConfig);
+  return null;
+  /* if (data && !data.seo) {
+    return null;
+  }
+  return getSeoMeta(data!.seo as SeoConfig); */
 };
 
 function Layout({children}: {children?: React.ReactNode}) {
@@ -144,22 +172,40 @@ function Layout({children}: {children?: React.ReactNode}) {
   const data = useRouteLoaderData<typeof loader>('root');
   const locale = data?.selectedLocale ?? DEFAULT_LOCALE;
 
+  useEffect(() => {
+    addGtmScript(data?.GTM_ID);
+  }, [data?.GTM_ID]);
+
   return (
     <html lang={locale.language}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <meta name="msvalidate.01" content="A352E6A0AF9A652267361BBB572B8468" />
-        <link rel="stylesheet" href={styles}></link>
         <Meta />
         <Links />
+        <Script
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}`,
+          }}
+        ></Script>
       </head>
       <body>
+        <noscript>
+          <iframe
+            src="https://load.sst.comptoir-sud-pacifique.com/ns.html?id=GTM-P6PQHT5R"
+            height="0"
+            width="0"
+            style={{display: 'none', visibility: 'hidden'}}
+          ></iframe>
+        </noscript>
+
         {data ? (
           <Analytics.Provider
             cart={data.cart}
             shop={data.shop}
             consent={data.consent}
+            canTrack={() => data.isProduction}
           >
             <PageLayout
               key={`${locale.language}-${locale.country}`}
@@ -167,6 +213,8 @@ function Layout({children}: {children?: React.ReactNode}) {
             >
               {children}
             </PageLayout>
+            <ThirdPartyAnalyticsIntegration />
+            <GoogleTagManager />
           </Analytics.Provider>
         ) : (
           children
@@ -217,100 +265,37 @@ export function ErrorBoundary({error}: {error: Error}) {
   );
 }
 
-const LAYOUT_QUERY = `#graphql
-  query layout(
-    $language: LanguageCode
-    $headerMenuHandle: String!
-    $footerMenuHandle: String!
-  ) @inContext(language: $language) {
-    shop {
-      ...Shop
-    }
-    headerMenu: menu(handle: $headerMenuHandle) {
-      ...Menu
-    }
-    footerMenu: menu(handle: $footerMenuHandle) {
-      ...Menu
-    }
-  }
-  fragment Shop on Shop {
-    id
-    name
-    description
-    primaryDomain {
-      url
-    }
-    brand {
-      logo {
-        image {
-          url
-        }
-      }
-    }
-  }
-  fragment MenuItem on MenuItem {
-    id
-    resourceId
-    tags
-    title
-    type
-    url
-  }
-  fragment ChildMenuItem on MenuItem {
-    ...MenuItem
-  }
-  fragment ParentMenuItem on MenuItem {
-    ...MenuItem
-    items {
-      ...ChildMenuItem
-    }
-  }
-  fragment Menu on Menu {
-    id
-    items {
-      ...ParentMenuItem
-    }
-  }
-` as const;
+let gtmScriptAdded = false;
 
-async function getLayoutData({storefront, env}: AppLoadContext) {
-  const data = await storefront.query(LAYOUT_QUERY, {
-    variables: {
-      headerMenuHandle: 'main-menu',
-      footerMenuHandle: 'footer',
-      language: storefront.i18n.language,
-    },
-  });
+declare global {
+  interface Window {
+    [key: string]: object[];
+  }
+}
 
-  invariant(data, 'No data returned from Shopify API');
+function addGtmScript(GTM_ID: string) {
+  if (!GTM_ID || gtmScriptAdded) {
+    return;
+  }
 
-  /*
-    Modify specific links/routes (optional)
-    @see: https://shopify.dev/api/storefront/unstable/enums/MenuItemType
-    e.g here we map:
-      - /blogs/news -> /news
-      - /blog/news/blog-post -> /news/blog-post
-      - /collections/all -> /products
-  */
-  const customPrefixes = {BLOG: '', CATALOG: 'products'};
+  (function (w: Window, d: Document, s: 'script', l: string, i: string) {
+    w[l] = w[l] || [];
+    w[l].push({
+      'gtm.start': new Date().getTime(),
+      event: 'gtm.js',
+    });
+    var f = d.getElementsByTagName(s)[0],
+      j = d.createElement(s);
+    j.async = true;
+    j.src = 'https://load.sst.comptoir-sud-pacifique.com/2u7uzhicouo.js?' + i;
+    f.parentNode?.insertBefore(j, f);
+  })(
+    window,
+    document,
+    'script',
+    'dataLayer',
+    'eo7ybtbs=aWQ9R1RNLVA2UFFIVDVS&apiKey=fcf9dee7',
+  );
 
-  const headerMenu = data?.headerMenu
-    ? parseMenu(
-        data.headerMenu,
-        data.shop.primaryDomain.url,
-        env,
-        customPrefixes,
-      )
-    : undefined;
-
-  const footerMenu = data?.footerMenu
-    ? parseMenu(
-        data.footerMenu,
-        data.shop.primaryDomain.url,
-        env,
-        customPrefixes,
-      )
-    : undefined;
-
-  return {shop: data.shop, headerMenu, footerMenu};
+  gtmScriptAdded = true;
 }
