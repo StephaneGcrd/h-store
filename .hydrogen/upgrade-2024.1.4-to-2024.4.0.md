@@ -241,7 +241,7 @@ import type {
 
 // ...
 
-declare module '@shopify/remix-oxygen' {
+declare module '@netlify/remix-runtime' {
   // ...
 
 + interface SessionData extends HydrogenSessionData {}
