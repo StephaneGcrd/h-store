@@ -38,8 +38,7 @@ import {getLayoutData} from './data/layout';
 import {I18N_CONTENT_QUERY} from './graphql/layout/i18nQuery';
 
 import tailwindCss from './styles/tailwind.css?url';
-import resetStyles from './styles/reset.css?url';
-import styles from '~/styles/app.css?url';
+
 import {DISCOVERY_OFFER_QUERY} from './graphql/discover-offer/DiscoveryOfferQueries';
 import {ThirdPartyAnalyticsIntegration} from './components/ThirdPartyAnalyticsIntegration';
 import {GoogleTagManager} from './components/GoogleTagManager';
@@ -68,9 +67,23 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
 
 export const links: LinksFunction = () => {
   return [
-    {rel: 'stylesheet', href: tailwindCss},
-    {rel: 'stylesheet', href: resetStyles},
-    {rel: 'stylesheet', href: styles},
+    {
+      rel: 'preconnect',
+      href: 'https://use.typekit.net',
+      crossOrigin: 'anonymous',
+    },
+
+    // Charger le CSS d’Adobe Typekit de façon non bloquante
+    {
+      rel: 'stylesheet',
+      href: 'https://use.typekit.net/iku7gkb.css', // Remplacez XXXXX par votre identifiant Typekit
+      media: 'print',
+      onLoad: "this.media='all'",
+    },
+    {
+      rel: 'stylesheet',
+      href: tailwindCss,
+    },
     {
       rel: 'preconnect',
       href: 'https://cdn.shopify.com',

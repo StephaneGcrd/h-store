@@ -1,15 +1,9 @@
 import {Image} from '@shopify/hydrogen';
 import {SectionContentImageText} from '~/types';
 
-import {useEffect, useMemo, useState} from 'react';
 import {Link} from '../Link';
 
 const ImageText = ({element}: {element: SectionContentImageText}) => {
-  const size = useWindowSize();
-
-  const isSizeDefined = size && size.width;
-  const isDesktop = isSizeDefined && size.width > 767;
-
   const {
     action_btn_link,
     action_btn_text,
@@ -63,20 +57,20 @@ const ImageText = ({element}: {element: SectionContentImageText}) => {
               (text_color == 'white' ? 'opacity-15' : 'opacity-0')
             } absolute z-10`}
           ></div>
-          {isSizeDefined ? (
+          <>
             <Image
-              data={
-                size && size.width && size.width > 767
-                  ? desktop_image
-                  : mobile_image || desktop_image
-              }
-              className={`object-cover h-full w-full absolute`}
+              data={mobile_image}
+              className={`object-cover h-full w-full absolute block md:hidden`}
+              fetchPriority="high"
               loading="eager"
             />
-          ) : (
-            <div className="bg-grey-300 w-full h-full"></div>
-          )}
-
+            <Image
+              data={desktop_image}
+              className={`object-cover h-full w-full absolute hidden md:block`}
+              fetchPriority="high"
+              loading="eager"
+            />
+          </>
           <div className="bg-black w-full h-full absolute opacity-0"></div>
           <div className="absolute w-full h-full grid grid-cols-1 md:grid-cols-2 z-30">
             <div
@@ -126,33 +120,6 @@ const ImageText = ({element}: {element: SectionContentImageText}) => {
 };
 
 export default ImageText;
-
-function useWindowSize() {
-  // Initialize state with undefined width/height so server and client renders match
-  // Learn more here: https://joshwcomeau.com/react/the-perils-of-rehydration/
-  const [windowSize, setWindowSize] = useState({
-    width: undefined,
-    height: undefined,
-  });
-
-  useEffect(() => {
-    // Handler to call on window resize
-    function handleResize() {
-      // Set window width/height to state
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    }
-    // Add event listener
-    //window.addEventListener('resize', handleResize);
-    // Call handler right away so state gets updated with initial window size
-    handleResize();
-    // Remove event listener on cleanup
-    //return () => window.removeEventListener('resize', handleResize);
-  }, []); // Empty array ensures that effect is only run on mount
-  return windowSize;
-}
 
 /* const oldComponentText = () => (
   <div className="absolute w-full h-full  grid grid-cols-1 md:grid-cols-2">

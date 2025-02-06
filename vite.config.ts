@@ -49,5 +49,7 @@ export default defineConfig({
     // Allow a strict Content-Security-Policy
     // withtout inlining assets as base64:
     assetsInlineLimit: 0,
+    cssCodeSplit: true, // Permet de diviser le CSS en plusieurs fichiers pour éviter le blocage
+    minify: 'esbuild', // Minification rapide et efficace du CSS
   },
 });
